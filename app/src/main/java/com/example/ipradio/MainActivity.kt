@@ -25,7 +25,7 @@ import com.example.ipradio.RadioData.Radio
 
 
 class MainActivity : ComponentActivity() {
-
+// ~/Library/Android/sdk/extras/google/auto $./desktop-head-unit --usb
     // ...
     private var songInfo by mutableStateOf<String>("Empty...")
     private lateinit var playbackManager: PlaybackManager

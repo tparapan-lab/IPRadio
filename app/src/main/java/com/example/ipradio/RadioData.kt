@@ -1,6 +1,7 @@
 package com.example.ipradio
 
 import java.time.Duration
+import com.example.ipradio.R
 
 class RadioData {
 
@@ -34,7 +35,8 @@ class RadioData {
         ),
         Radio(
             "1Rock",
-            "https://25543.live.streamtheworld.com/RADIO_1_ROCKAAC_L.aac",
+//            "https://27903.live.streamtheworld.com/RADIO_1_ROCKAAC_L.aac",
+            "http://149.13.0.81/radio1rock.ogg",
 //                "https://play.global.audio/radio1rock128",
             "https://www.radio1rock.bg/theme_assets/radio1rock/images/logo.png?v=0",
             "",
@@ -44,7 +46,8 @@ class RadioData {
             emptyMap()
         ), //"http://play.global.audio/radio1rock.opus"
         Radio(
-            "Darik", "https://darikradio.by.host.bg:8000/S2-128",
+//            "Darik", "https://darikradio.by.host.bg:8000/S2-128",
+            "Darik", "https://a12.asurahosting.com/listen/darik_radio/radio.mp3",
             "https://darikradio.bg/img/logo.new.png",
             "",
             R.drawable.darik_logo,
@@ -97,7 +100,7 @@ class RadioData {
         "https://cadena100-cope.flumotion.com/chunks.m3u8",
 //        "http://www.w3.org/2000/svg",
 //        {"id": null, "uuid": "DFLT", "value": "{\"image\": \"\", \"author\": \"\", \"title\": \"RockFM\"}"}%
-        "https://cadena100-cdnsta.agilecontent.com/cadena100-frontend/public/assets/img/cadena-100@3x-798d508aa9118a7b741a03695b4ad779.png",
+        "https://www.cadena100.es/estaticos/apple-touch-icon-192x192.png",
             "",
         0,
             "https://bo-cope-webtv.flumotion.com/api/active?format=json&podId=76",

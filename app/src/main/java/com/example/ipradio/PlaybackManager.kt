@@ -84,7 +84,10 @@ class PlaybackManager private constructor(context: Context) {
 
         setPlaybackState(PlaybackManagerState.PLAYING)
 
-        songManager.fetchText(radio)
+        // Get Radio name
+//        songManager.fetchText(radio)
+        songManager.radio = radio
+        songManager.fetchTextPeriodically()
     }
 
     fun play() {

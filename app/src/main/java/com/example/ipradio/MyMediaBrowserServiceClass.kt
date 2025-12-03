@@ -1,12 +1,15 @@
 package com.example.ipradio
 
 
+import android.app.ActivityManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -15,7 +18,10 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+//import androidx.compose.ui.input.key.KeyEvent
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.utils.MediaConstants
 import androidx.media3.common.MediaItem
@@ -83,7 +89,7 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
                         val playbackStateExtras = Bundle().apply {
                             putString(
                                 MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID,
-                                extras?.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+                                extras.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
                             )
                         }
                         setExtras(playbackStateExtras)
@@ -93,57 +99,55 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
 
                     setMetadata(
                         MediaMetadataCompat.Builder().apply {
-                            if (extras != null) {
-                                putString(
+                            putString(
 //                                MediaMetadataCompat.METADATA_KEY_MEDIA_ID, extras.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
-                                    MediaMetadataCompat.METADATA_KEY_MEDIA_ID, playbackManager.selectedRadioInd.toString()
-                                )
-                                putString(
+                                MediaMetadataCompat.METADATA_KEY_MEDIA_ID, playbackManager.selectedRadioInd.toString()
+                            )
+                            putString(
 //                                    MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE)
-                                    MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, playbackManager.selectedRadio?.name.toString()
-                                )
-                                putString(
-                                    MediaMetadataCompat.METADATA_KEY_ARTIST, "Artist"
+                                MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, playbackManager.selectedRadio?.name.toString()
+                            )
+                            putString(
+                                MediaMetadataCompat.METADATA_KEY_ARTIST, "Artist"
 //                                    extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE)
-                                )
-                                putString(
-                                    MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, "Album"
+                            )
+                            putString(
+                                MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, "Album"
 //                                    extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE)
-                                )
-                                putString(
-                                    MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "A" + playbackManager.selectedRadio?.songAuthor.toString()
+                            )
+                            putString(
+                                MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "A" + playbackManager.selectedRadio?.songAuthor.toString()
 //                                    extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE)
-                                )
-                                putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, "DISPLAY_DESCRIPTION")
+                            )
+                            putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, "DISPLAY_DESCRIPTION")
 //                                putLong(
 //                                    MediaMetadataCompat.METADATA_KEY_DURATION, 1235678
 ////                                    extras.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
 //                                )
-                                putString(
+                            putString(
 //                                    MediaMetadataCompat.METADATA_KEY_MEDIA_URI, radio.url
-                                    MediaMetadataCompat.METADATA_KEY_MEDIA_URI, extras.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
-                                )
-                                putLong(
-                                    RADIO_INDEX, extras.getInt(RADIO_INDEX).toLong()
-                                )
-                                putString(
-                                    "com.example.ipradio.METADATA_KEY_STREAM_BITRATE", "128kbps"
-                                )
-                                putText(
-                                    "com.example.ipradio.METADATA_KEY_STREAM_BITRATE2", "128kbps"
-                                )
-                                val aa = extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI)
+                                MediaMetadataCompat.METADATA_KEY_MEDIA_URI, extras.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
+                            )
+                            putLong(
+                                RADIO_INDEX, extras.getInt(RADIO_INDEX).toLong()
+                            )
+                            putString(
+                                "com.example.ipradio.METADATA_KEY_STREAM_BITRATE", "128kbps"
+                            )
+                            putText(
+                                "com.example.ipradio.METADATA_KEY_STREAM_BITRATE2", "128kbps"
+                            )
+                            val aa = extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI)
 
-                                putString(
-                                    MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI)
-                                )
+                            putString(
+                                MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, extras.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI)
+                            )
 //                                putString(
 //                                    MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,
 //                                    ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
 //                                            + "com.example.ipradio" + "/" + R.drawable.darik_logo
 //                                )
-                            }
-//                        if (albumCover != null) {
+                            //                        if (albumCover != null) {
 //                            putBitmap(
 //                                MediaMetadataCompat.METADATA_KEY_ART, albumCover
 //                            )
@@ -628,7 +632,8 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
         // Set appropriate "Favorite" icon on Custom action:
 //        val mediaId = currentMusic.description.mediaId ?: return
 //        val musicId: String = MediaIDHelper.extractMusicIDFromMediaID(mediaId)
-        val favoriteIcon: Int = androidx.media3.ui.R.drawable.exo_icon_shuffle_on
+//        val favoriteIcon: Int = androidx.media3.ui.R.drawable.exo_icon_shuffle_on
+        val favoriteIcon: Int = R.drawable.ic_launcher_foreground
 //            if (mMusicProvider.isFavorite(musicId)) R.drawable.star_off else R.drawable.star_on
         Log.d(
             "TAG", "updatePlaybackState, setting Favorite custom action of music ",
@@ -646,6 +651,7 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
                 .build()
         )
     }
+
     private fun updatePlaybackState(state: Int) {
 
         println("updatePlaybackState : $state")
@@ -779,7 +785,7 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
 
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle?) {
             println("Teodor: MyMediaSessionCallback::onPlayFromMediaId: $mediaId")
-            println("Playing from Media Id")
+            println("Playing from Media Id: $mediaId")
 
 //            super.onPlayFromMediaId(mediaId, extras)
 
@@ -943,6 +949,58 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
 
             super.onRewind()
         }
+
+//        override fun onMediaButtonEvent(mediaButtonIntent: Intent?): Boolean {
+////            val keyEvent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+////                mediaButtonIntent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+////            } else {
+////                @Suppress("DEPRECATION")
+////                mediaButtonIntent?.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+////            }
+//
+//            val keyEvent = mediaButtonIntent?.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+//            Log.d("TAG", "onMediaButtonEvent: KeyEvent: ${keyEvent?.action}")
+//            if (keyEvent?.action == KeyEvent.ACTION_DOWN) {
+//                when (keyEvent.keyCode) {
+//                    KeyEvent.KEYCODE_MEDIA_NEXT -> {
+//                        if (isAppRunning()) {
+//                            onSkipToNext()
+//                        } else {
+//                            launchApp()
+//                        }
+//                        return true
+//                    }
+//                    KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+//                        if (isAppRunning()) {
+//                            onSkipToPrevious()
+//                        } else {
+//                            launchApp()
+//                        }
+//                        return true
+//                    }
+//                }
+//            }
+//            return super.onMediaButtonEvent(mediaButtonIntent)
+//        }
+
+        private fun launchApp() {
+            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val runningTasks = activityManager.getRunningTasks(1)
+            val topActivity = runningTasks[0].topActivity
+            if (topActivity?.packageName != "com.example.ipradio") {
+                val launchIntent = packageManager.getLaunchIntentForPackage("com.example.ipradio")
+                launchIntent?.let { startActivity(it) }
+            }
+            onSkipToPrevious()
+        }
+    }
+
+    private fun isAppRunning(): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val runningAppProcesses = activityManager.runningAppProcesses
+        val packageName = applicationContext.packageName
+
+        return runningAppProcesses.any { it.processName == packageName }
     }
 
     //   ------------------------------------  MyMediaSessionCallback  END ------------------------------------
@@ -968,5 +1026,4 @@ class MyMediaBrowserServiceClass : MediaBrowserServiceCompat(), PlaybackStateLis
             super.onSessionReady()
         }
     }
-
 }

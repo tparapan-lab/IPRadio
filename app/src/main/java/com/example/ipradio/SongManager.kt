@@ -1,9 +1,11 @@
 package com.example.ipradio
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.*
@@ -13,13 +15,66 @@ import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Objects
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.log
 
 class SongManager {
     private val _text = MutableLiveData<String>()
     val text: LiveData<String> get() = _text
+    private val delays = listOf (10, 30, 60, 10, 30, 60, 30, 10)
+
+    private val radioRef = AtomicReference(RadioData.Radio("", "", "", "", 0, "", emptyMap()))
+
+    var radio: RadioData.Radio
+        get() = radioRef.get()
+        set(value) = radioRef.set(value)
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    fun fetchTextPeriodically() {
+        val currRadio = radio
+        coroutineScope.launch {
+            var updated = false
+            var delayInd = 0;
+            while (true) {
+                if (currRadio != radio)
+                {
+                    break
+                }
+                try {
+                    val result = makeNetworkRequest(radio.infoDataUrl)
+                    withContext(Dispatchers.Main) {
+                        val songInfo = parseData(result, radio.name)
+
+                        Log.e("SongManager", " - - - Try SongInfo $songInfo - $delayInd")
+
+                        if (songInfo != _text.value) {
+                            radio.songAuthor = songInfo
+                            _text.value = songInfo
+
+                            Log.e("SongManager", " - - - SongInfo $songInfo - $delayInd")
+
+                            updated = true
+                            delayInd = 0
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+//                if (updated)
+//                    break
+                val delayTime = delays[delayInd++] * 1000L
+
+                delay(delayTime)
+
+                if (delayInd >= delays.size)
+                {
+                    delayInd = delays.size - 1
+                }
+            }
+        }
+    }
 
     fun fetchText(radio: RadioData.Radio) {
         coroutineScope.launch {
