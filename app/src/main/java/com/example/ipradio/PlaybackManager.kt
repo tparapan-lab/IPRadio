@@ -43,10 +43,7 @@ class PlaybackManager private constructor(context: Context) {
     var selectedRadio by mutableStateOf<Radio?>(null)
     var selectedRadioInd = -1
 
-    private var blii : (text: String) -> Unit = {}
-
     private var songManager = SongManager()
-    var testStr : String = ""
     private var _songInfo = MutableLiveData<String>("")
     var songInfo: LiveData<String> = _songInfo
 
@@ -64,14 +61,9 @@ class PlaybackManager private constructor(context: Context) {
             return
         }
 
-        println("Teodor: PlaybackManager::play   ---  ${listeners.size}")
 
 
         val mediaItem: MediaItem = MediaItem.fromUri(Uri.parse(radio.url))
-
-//        player = ExoPlayer.Builder(appContext)
-////            .setMediaSourceFactory(custom)
-//            .build()
 
         player.setMediaItem(mediaItem)
         player.prepare()
@@ -80,12 +72,10 @@ class PlaybackManager private constructor(context: Context) {
         selectedRadio = radio
         selectedRadioInd = radios.indexOf(radio)
         _playbackState.postValue(PlaybackManagerState.PLAYING) //?
-        blii("play")
 
         setPlaybackState(PlaybackManagerState.PLAYING)
 
         // Get Radio name
-//        songManager.fetchText(radio)
         songManager.radio = radio
         songManager.fetchTextPeriodically()
     }
@@ -103,15 +93,12 @@ class PlaybackManager private constructor(context: Context) {
         selectedRadio = null
         _playbackState.postValue(PlaybackManagerState.STOPPED) //?
         setPlaybackState(PlaybackManagerState.STOPPED)
-
-        blii("stop")
     }
 
     fun pause() {
         player.pause()
         _playbackState.postValue(PlaybackManagerState.PAUSED) // ?
         setPlaybackState(PlaybackManagerState.PAUSED)
-        blii("pause")
     }
 
     fun getRadiosList(): List<Radio> {
@@ -161,8 +148,6 @@ class PlaybackManager private constructor(context: Context) {
     fun addPlaybackStateListener(listener: PlaybackStateListener) {
 
         listeners.add(listener)
-
-        println("Teodor: PlaybackManager::addPlaybackStateListener   ---  size: ${listeners.size}")
     }
 
     fun removePlaybackStateListener(listener: PlaybackStateListener) {
@@ -170,24 +155,16 @@ class PlaybackManager private constructor(context: Context) {
     }
 
     private fun notifyPlaybackStateChange(newState: PlaybackManagerState) {
-        println("Teodor: PlaybackManager::notifyPlaybackStateChange: newState: $newState")
         listeners.forEach { listener ->
             listener.onPlaybackStateChanged(newState)
         }
     }
 
     fun setPlaybackState(newState: PlaybackManagerState) {
-
-        println("Teodor: PlaybackManager::setPlaybackState")
         _playbackState.postValue(newState)
         notifyPlaybackStateChange(newState)
     }
 
-    fun setCallback(bli : (String) -> Unit)
-    {
-        println(" TEODOR  ")
-        blii = bli
-    }
 
     companion object {
         @Volatile
@@ -205,55 +182,3 @@ class PlaybackManager private constructor(context: Context) {
 
 
 
-
-/*
-class PlaybackManager(context: Context) {
-//    private val player: SimpleExoPlayer = SimpleExoPlayer.Builder(context).build()
-private val player = ExoPlayer.Builder(context).build()
-//    val mediaSession = MediaSession.Builder(context, player).build()
-//    private var mediaSession: MediaSession? = null
-    val mediaSession = MediaSessionCompat(context, "MySession")
-
-
-//    fun createMediaPlayer(url: String) {
-//        val mediaItem: MediaItem = MediaItem.fromUri(Uri.parse(url))
-//        player.setMediaItem(mediaItem)
-//        player.prepare()
-//        player.playWhenReady = true
-//    }
-
-    // Get the current playback position from the player
-    val playbackPosition: Long
-        get() = player.currentPosition
-
-    fun createMediaPlayer(url: String) {
-        val mediaItem: MediaItem = MediaItem.fromUri(Uri.parse(url))
-
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.playWhenReady = true
-    }
-
-    fun start() {
-        player.play()
-    }
-
-    fun pause() {
-        player.pause()
-    }
-
-    fun stop() {
-        player.stop()
-    }
-
-    fun releasePlayer() {
-        player.release() // Release the player resources
-        mediaSession.release() // Release the media session resources
-    }
-
-    fun play() {
-        player.play()
-    }
-
-}
-*/
