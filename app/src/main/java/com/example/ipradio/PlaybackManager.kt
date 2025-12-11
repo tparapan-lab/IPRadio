@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
+import androidx.compose.runtime.toMutableStateList
 
 
 enum class PlaybackManagerState {
@@ -38,7 +39,24 @@ class PlaybackManager private constructor(context: Context) {
     var playbackState: LiveData<PlaybackManagerState> = _playbackState
     private val listeners = mutableListOf<PlaybackStateListener>()
 
-    private val radios = radioData.radios
+    private val radios = radioData.radios.toMutableStateList()
+
+    fun updateRadio(index: Int, newRadio: Radio) {
+        if (index in radios.indices) {
+            val oldRadio = radios[index]
+            radios[index] = newRadio
+            
+            if (selectedRadio == oldRadio) {
+                selectedRadio = newRadio
+                songManager.radio = newRadio
+                songManager.fetchTextPeriodically()
+            }
+        }
+    }
+
+    fun addRadio(radio: Radio) {
+        radios.add(radio)
+    }
 //    lateinit var selectedRadio: Radio
     var selectedRadio by mutableStateOf<Radio?>(null)
     var selectedRadioInd = -1
